@@ -28,7 +28,7 @@
 
 ## Setup Instructions
 Clone the repository
-- git clone https://github.com/abhishekvats29/vehicle-dashboard.git
+- git clone https://github.com/abhishekvats29/Vehicle-Registrations---Investor-Dashboard.git
 - cd vehicle-dashboard
 
 Create a virtual environment
