@@ -5,6 +5,9 @@
 - Built with Streamlit, it enables filtering, date range selection, and trend visualization in a clean, professional UI.
 
 ---
+Screenshot
+Example investor-friendly dashboard view.
+
 
 ## Tech Stack
 
