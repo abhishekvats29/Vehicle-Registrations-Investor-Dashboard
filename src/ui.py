@@ -2,10 +2,11 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-
 from charts import calculate_metrics, plot_trend, plot_top_manufacturers
 
-# --- PAGE CONFIG ---
+# -------------------
+# PAGE CONFIGURATION
+# -------------------
 st.set_page_config(
     page_title="Vehicle Registration Investor Dashboard",
     page_icon="🚗",
@@ -13,7 +14,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- CUSTOM CSS FOR PROFESSIONAL LOOK ---
+# -------------------
+# CUSTOM PAGE STYLES
+# -------------------
 st.markdown("""
     <style>
         .stApp {
@@ -36,23 +39,33 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- TITLE ---
+# -------------------
+# PAGE TITLE
+# -------------------
 st.title("📊 Vehicle Registration Investor Dashboard")
-st.markdown("#### Track growth trends, market share, and performance by manufacturer.")
+st.markdown(
+    "#### Track growth trends, market share, and performance by manufacturer."
+)
 
-# --- SIDEBAR FILTERS ---
-st.sidebar.header("🔍 Filters")
-
+# -------------------
+# LOAD DATA
+# -------------------
 @st.cache_data
 def load_data():
+    """Load cleaned vehicle registration data."""
     df = pd.read_excel("data/processed/vehicle_data_cleaned.xlsx")
-    df['Date'] = pd.to_datetime(df['Date'])
+    df["Date"] = pd.to_datetime(df["Date"])
     return df
 
 df = load_data()
 
-# Filters
-min_date, max_date = df['Date'].min(), df['Date'].max()
+# -------------------
+# SIDEBAR FILTERS
+# -------------------
+st.sidebar.header("🔍 Filters")
+
+# Date filter
+min_date, max_date = df["Date"].min(), df["Date"].max()
 date_range = st.sidebar.date_input(
     "Select Date Range",
     value=[min_date, max_date],
@@ -60,27 +73,33 @@ date_range = st.sidebar.date_input(
     max_value=max_date
 )
 
+# Vehicle type filter
 vehicle_types = st.sidebar.multiselect(
     "Select Vehicle Categories",
-    options=df['Vehicle_Type'].unique(),
-    default=df['Vehicle_Type'].unique()
+    options=df["Vehicle_Type"].unique(),
+    default=df["Vehicle_Type"].unique()
 )
 
+# Manufacturer filter
 manufacturers = st.sidebar.multiselect(
     "Select Manufacturers",
-    options=df['Manufacturer'].unique(),
-    default=df['Manufacturer'].unique()
+    options=df["Manufacturer"].unique(),
+    default=df["Manufacturer"].unique()
 )
 
-# --- DATA FILTERING ---
+# -------------------
+# FILTER DATA
+# -------------------
 filtered_df = df[
-    (df['Date'] >= pd.to_datetime(date_range[0])) &
-    (df['Date'] <= pd.to_datetime(date_range[1])) &
-    (df['Vehicle_Type'].isin(vehicle_types)) &
-    (df['Manufacturer'].isin(manufacturers))
+    (df["Date"] >= pd.to_datetime(date_range[0])) &
+    (df["Date"] <= pd.to_datetime(date_range[1])) &
+    (df["Vehicle_Type"].isin(vehicle_types)) &
+    (df["Manufacturer"].isin(manufacturers))
 ]
 
-# --- METRICS ---
+# -------------------
+# METRICS SECTION
+# -------------------
 st.markdown("### 📈 Key Metrics")
 total, yoy, qoq = calculate_metrics(filtered_df)
 
@@ -89,21 +108,27 @@ col1.metric("Total Registrations", f"{total:,}")
 col2.metric("YoY Growth", f"{yoy:.2f}%")
 col3.metric("QoQ Growth", f"{qoq:.2f}%")
 
-# --- TREND CHART ---
+# -------------------
+# TREND CHART
+# -------------------
 st.markdown("### 📅 Registration Trends Over Time")
-trend_fig = plot_trend(filtered_df)
-st.plotly_chart(trend_fig, use_container_width=True)
+st.plotly_chart(plot_trend(filtered_df), use_container_width=True)
 
-# --- TOP MANUFACTURERS ---
+# -------------------
+# TOP MANUFACTURERS CHART
+# -------------------
 st.markdown("### 🏆 Top Manufacturers")
-top_manu_fig = plot_top_manufacturers(filtered_df)
-st.plotly_chart(top_manu_fig, use_container_width=True)
+st.plotly_chart(plot_top_manufacturers(filtered_df), use_container_width=True)
 
-# --- DATA TABLE ---
+# -------------------
+# DATA TABLE
+# -------------------
 st.markdown("### 📋 Detailed Data")
 st.dataframe(filtered_df.style.format({"Registrations": "{:,}"}))
 
-# --- FOOTER ---
+# -------------------
+# FOOTER
+# -------------------
 st.markdown("---")
 st.markdown(
     "Built with ❤️ using Streamlit & Plotly | Data Source: Vahan Dashboard",
