@@ -1,8 +1,8 @@
 # Vehicle Registration Investor Dashboard
 ## Overview
-This project is an interactive vehicle registration dashboard designed with an investor’s perspective in mind.
-It visualizes Year-over-Year (YoY) and Quarter-over-Quarter (QoQ) growth for different vehicle categories and manufacturers using public Vahan Dashboard data.
-Built with Streamlit, it enables filtering, date range selection, and trend visualization in a clean, professional UI.
+- This project is an interactive vehicle registration dashboard designed with an investor’s perspective in mind.
+- It visualizes Year-over-Year (YoY) and Quarter-over-Quarter (QoQ) growth for different vehicle categories and manufacturers using public Vahan Dashboard data.
+- Built with Streamlit, it enables filtering, date range selection, and trend visualization in a clean, professional UI.
 
 ---
 
@@ -28,14 +28,13 @@ Built with Streamlit, it enables filtering, date range selection, and trend visu
 
 ## Setup Instructions
 Clone the repository
+- git clone https://github.com/yourusername/vehicle-dashboard.git
+- cd vehicle-dashboard
 
-git clone https://github.com/yourusername/vehicle-dashboard.git
-cd vehicle-dashboard
 Create a virtual environment
-
-python -m venv .venv
-source .venv/bin/activate   # macOS/Linux
-.venv\Scripts\activate      # Windows
+- python -m venv .venv
+- source .venv/bin/activate   # macOS/Linux
+- .venv\Scripts\activate      # Windows
 
 Install dependencies
 - pip install -r requirements.txt
@@ -61,10 +60,10 @@ Optional – Run via Docker
 ---
 
 ## 👤 Author
-Abhishek Vats, Backend developer
+- Abhishek Vats, Backend developer
 
-Copyright © 2025 Abhishek Vats. All rights reserved.
+- Copyright © 2025 Abhishek Vats. All rights reserved.
 
 ## 📄 License
-This project is Created as part of a hiring process assignment.
+- - This project is Created as part of a hiring process assignment.
 
