@@ -6,7 +6,8 @@
 
 ---
 Screenshot
-Example investor-friendly dashboard view.
+- Example investor-friendly dashboard view.
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/b12ae738-4d45-494c-8eba-24779502de69" />
 
 
 ## Tech Stack
