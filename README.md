@@ -5,9 +5,9 @@
 - Built with Streamlit, it enables filtering, date range selection, and trend visualization in a clean, professional UI.
 
 ---
-## Screenshot
+## Demo Screenshot
 - Example investor-friendly dashboard view.
-<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/b12ae738-4d45-494c-8eba-24779502de69" />
+<img width="1255" height="691" alt="Image" src="https://github.com/user-attachments/assets/b46ff0dd-99ed-4c7e-a08f-0d7401a59b49" />
 
 
 ## Tech Stack
