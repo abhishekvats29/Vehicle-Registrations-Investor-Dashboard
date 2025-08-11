@@ -1,0 +1,29 @@
+# Virtual environment
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# macOS files
+.DS_Store
+
+# Data folders
+data/raw/
+data/processed/
+
+# Environment variables
+.env
+
+# Streamlit cache
+.streamlit/
+
+# Jupyter notebooks checkpoints (if you add notebooks later)
+.ipynb_checkpoints/
+
+# Docker-related
+*.log
+*.tmp
