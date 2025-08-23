@@ -8,21 +8,28 @@ from io import BytesIO
 BASE_DIR = os.path.dirname(__file__)
 RAW_PATH = os.path.join(BASE_DIR, "data", "raw", "vehicle_data_raw.csv")
 
-def fetch_from_url(csv_url: str, raw_path: str = RAW_PATH):
+def fetch_from_url(csv_url: str = None, raw_path: str = RAW_PATH):
     """
     Try to download CSV from csv_url and save to raw_path.
-    Raises exception if download fails.
+    If csv_url is None, fallback to sample data generation.
+    Returns DataFrame and path.
     """
-    print(f">> Attempting to download data from: {csv_url}")
-    resp = requests.get(csv_url, timeout=30)
-    resp.raise_for_status()
-
-    df = pd.read_csv(BytesIO(resp.content))
-
-    os.makedirs(os.path.dirname(raw_path), exist_ok=True)
-    df.to_csv(raw_path, index=False)
-    print(f">> Downloaded and saved raw data to: {raw_path}")
-    return df, raw_path
+    if csv_url:
+        try:
+            print(f">> Attempting to download data from: {csv_url}")
+            resp = requests.get(csv_url, timeout=30)
+            resp.raise_for_status()
+            df = pd.read_csv(BytesIO(resp.content))
+            os.makedirs(os.path.dirname(raw_path), exist_ok=True)
+            df.to_csv(raw_path, index=False)
+            print(f">> Downloaded and saved raw data to: {raw_path}")
+            return df, raw_path
+        except Exception as e:
+            print(f">> Failed to fetch CSV: {e}")
+            print(">> Falling back to sample dataset.")
+            return generate_sample_raw(raw_path)
+    else:
+        return generate_sample_raw(raw_path)
 
 def generate_sample_raw(raw_path: str = RAW_PATH, n_months: int = 48, seed: int = 42):
     """
@@ -62,5 +69,7 @@ def generate_sample_raw(raw_path: str = RAW_PATH, n_months: int = 48, seed: int 
     return df, raw_path
 
 if __name__ == "__main__":
-    # Example usage
-    generate_sample_raw()
+    # Default: use Google Drive CSV link
+    DRIVE_SHEET_ID = "1q4Qn32MBJ8IfKWUlHy5907cjRD-uiKu_"
+    DRIVE_CSV_URL = f"https://docs.google.com/spreadsheets/d/{DRIVE_SHEET_ID}/export?format=csv"
+    fetch_from_url(DRIVE_CSV_URL)
