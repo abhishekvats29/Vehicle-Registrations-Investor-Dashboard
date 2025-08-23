@@ -1,4 +1,3 @@
-# src/data_clean.py
 import os
 import pandas as pd
 import numpy as np
@@ -47,26 +46,21 @@ def normalize_and_clean(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns=col_map)
     # Fill missing expected columns if absent
     if "Registrations" not in df.columns:
-        # maybe there is 'Count' column
-        df["Registrations"] = 1  # default to 1 if no counts provided (each row = 1)
+        df["Registrations"] = 1
     if "Manufacturer" not in df.columns:
         df["Manufacturer"] = "Unknown"
     if "Vehicle_Type" not in df.columns:
-        # attempt to infer from Manufacturer (simple mapping), else mark Unknown
         df["Vehicle_Type"] = "Unknown"
 
     # Parse dates
     if "Date" in df.columns:
         df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
     else:
-        # if no Date column, create monthly date column from Year & Month if available
         if "Year" in df.columns and "Month" in df.columns:
             df['Date'] = pd.to_datetime(df[['Year', 'Month']].assign(DAY=1))
         else:
-            # fallback: create synthetic monthly dates
             df['Date'] = pd.Timestamp.today().normalize()
 
-    # Drop rows with invalid dates or registrations missing
     before = len(df)
     df = df[~df['Date'].isna()].copy()
     df['Registrations'] = pd.to_numeric(df['Registrations'], errors='coerce').fillna(0).astype(int)
@@ -78,7 +72,7 @@ def normalize_and_clean(df: pd.DataFrame) -> pd.DataFrame:
     q = df['Date'].dt.quarter
     df['Quarter'] = df['Year'].astype(str) + "Q" + q.astype(str)
 
-    # Standardize Vehicle_Type values (map common strings)
+    # Standardize Vehicle_Type
     vt_map = {
         '2w': '2W', '2-w': '2W', 'two wheeler': '2W', 'two-wheeler': '2W',
         '3w': '3W', '3-w': '3W', 'three wheeler': '3W',
@@ -88,14 +82,14 @@ def normalize_and_clean(df: pd.DataFrame) -> pd.DataFrame:
         df['Vehicle_Type'].astype(str).str.strip().str.upper()
     )
 
-    # Remove empty rows: where registrations = 0 and manufacturer unknown and vehicle_type unknown
+    # Remove empty rows
     drop_mask = (df['Registrations'] == 0) & (df['Manufacturer'].str.lower() == 'unknown') & (df['Vehicle_Type'].str.lower() == 'unknown')
     dropped = drop_mask.sum()
     if dropped > 0:
         print(f">> Dropping {dropped} empty/irrelevant rows")
     df = df[~drop_mask].copy()
 
-    # Aggregate duplicates by month / vehicle_type / manufacturer (optional)
+    # Aggregate duplicates
     agg = df.groupby(['Date', 'Year', 'Quarter', 'Vehicle_Type', 'Manufacturer'], as_index=False)['Registrations'].sum()
 
     return agg
@@ -111,8 +105,10 @@ def run(cleaned_path: str = CLEANED_PATH, raw_path: str = RAW_PATH):
     save_clean(df_clean, cleaned_path)
     return cleaned_path
 
+# ✅ Alias for backward compatibility
+clean_data = normalize_and_clean
+
 if __name__ == "__main__":
-    # Standard run for debugging
     if not os.path.exists(RAW_PATH):
         print("Raw file not found - generate sample raw data first (use data_fetch.py).")
     else:
