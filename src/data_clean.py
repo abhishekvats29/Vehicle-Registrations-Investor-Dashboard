@@ -7,7 +7,7 @@ import numpy as np
 # -----------------------------
 BASE_DIR = os.path.dirname(__file__)
 RAW_PATH = os.path.join(BASE_DIR, "data", "raw", "vehicle_data_raw.csv")  # default CSV
-CLEANED_PATH = os.path.join(BASE_DIR, "data", "processed", "vehicle_data_cleaned.xlsx")
+CLEANED_PATH = os.path.join(BASE_DIR, "data", "processed", "vehicle_data_cleaned.xlsx")  # default Excel output
 
 # -----------------------------
 # Safe read raw file (CSV or Excel)
@@ -32,6 +32,7 @@ def normalize_and_clean(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df.columns = [str(c).strip() for c in df.columns]
 
+    # Map columns to expected schema
     col_map = {}
     for c in df.columns:
         lc = c.lower()
@@ -96,12 +97,17 @@ def normalize_and_clean(df: pd.DataFrame) -> pd.DataFrame:
     return agg
 
 # -----------------------------
-# Save cleaned data
+# Save cleaned data (engine-aware)
 # -----------------------------
 def save_clean(df: pd.DataFrame, cleaned_path: str = CLEANED_PATH):
     os.makedirs(os.path.dirname(cleaned_path), exist_ok=True)
-    # Explicitly specify engine to avoid Streamlit Cloud error
-    df.to_excel(cleaned_path, index=False, engine='openpyxl')
+    ext = os.path.splitext(cleaned_path)[1].lower()
+    if ext in [".xlsx", ".xls"]:
+        df.to_excel(cleaned_path, index=False, engine='openpyxl')
+    elif ext == ".csv":
+        df.to_csv(cleaned_path, index=False)
+    else:
+        raise ValueError(f"Unsupported file type for saving: {ext}")
     print(f">> Cleaned data saved to: {cleaned_path}")
 
 # -----------------------------
