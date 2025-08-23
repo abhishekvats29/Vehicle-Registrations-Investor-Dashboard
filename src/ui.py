@@ -1,79 +1,39 @@
 # src/ui.py
 import streamlit as st
 import pandas as pd
-import os
-from datetime import datetime
-from src import data_fetch, data_clean
 from charts import calculate_metrics, plot_trend, plot_top_manufacturers
 
 # --- PAGE CONFIG ---
 st.set_page_config(
     page_title="Vehicle Registration Investor Dashboard",
     page_icon="🚗",
-    layout="wide",  # full-width layout
+    layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CUSTOM CSS TO ELIMINATE CUTTING ---
+# --- CUSTOM CSS ---
 st.markdown("""
     <style>
-        /* Reduce top padding for the entire page */
-        .block-container {
-            padding-top: 0rem;  /* was 0.5rem or 1rem */
-            padding-bottom: 1rem;
-        }
-
-        /* Remove extra top margin above the title */
-        .css-1v3fvcr h1, .css-1v3fvcr h2, .css-1v3fvcr h3 {
-            margin-top: 0rem !important;
-        }
-
-        /* Ensure metrics and charts start immediately */
-        .stMetric {
-            margin-top: 0rem !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
-# --- HIDE STREAMLIT MENU, FOOTER, AND HEADER ---
-st.markdown("""
-    <style>
-        /* Hide Streamlit header & menu */
-        #MainMenu {visibility: hidden;}
-        header {visibility: hidden;}
-        footer {visibility: hidden;}
+        .stApp { background-color: #f8f9fa; }
+        div[data-testid="stMetricValue"] { font-size: 1.5rem; font-weight: 600; }
+        h1, h2, h3 { color: #2c3e50; }
+        [data-testid="stSidebar"] { background-color: #ffffff; }
+        .block-container { padding-top: 1rem; padding-bottom: 1rem; }
     </style>
 """, unsafe_allow_html=True)
 
+# --- TITLE ---
+st.title("📊 Vehicle Registration Investor Dashboard")
+st.markdown("#### Track growth trends, market share, and performance by manufacturer.")
 
-# --- HEADER WRAPPER ---
-with st.container():
-    st.title("📊 Vehicle Registration Investor Dashboard")
-    st.markdown("#### Track growth trends, market share, and performance by manufacturer.")
-
-
-
-
-# --- DATA PATHS & GOOGLE DRIVE LINK ---
-CLEANED_PATH = "src/data/processed/vehicle_data_cleaned.xlsx"
-DRIVE_SHEET_ID = "1q4Qn32MBJ8IfKWUlHy5907cjRD-uiKu_"
-DRIVE_CSV_URL = f"https://docs.google.com/spreadsheets/d/{DRIVE_SHEET_ID}/export?format=csv"
-
-# --- LOAD DATA WITH CACHING ---
+# --- LOAD CLEANED DATA ---
 @st.cache_data
 def load_data():
-    if os.path.exists(CLEANED_PATH):
-        df = pd.read_excel(CLEANED_PATH)
-    else:
-        df_raw, _ = data_fetch.fetch_from_url(DRIVE_CSV_URL)
-        df = data_clean.clean_data(df_raw)
-        os.makedirs(os.path.dirname(CLEANED_PATH), exist_ok=True)
-        df.to_excel(CLEANED_PATH, index=False)
+    df = pd.read_excel("data/processed/vehicle_data_cleaned.xlsx")
     df['Date'] = pd.to_datetime(df['Date'])
     return df
 
-with st.spinner("Loading dataset, please wait..."):
-    df = load_data()
-
+df = load_data()
 
 # --- SIDEBAR FILTERS ---
 st.sidebar.header("🔍 Filters")
@@ -104,30 +64,28 @@ filtered_df = df[
 ]
 
 # --- METRICS ---
-with st.expander("📈 Key Metrics", expanded=True):
-    total, yoy, qoq = calculate_metrics(filtered_df)
-    col1, col2, col3 = st.columns([1,1,1])
-    col1.metric("Total Registrations", f"{total:,}")
-    col2.metric("YoY Growth", f"{yoy:.2f}%")
-    col3.metric("QoQ Growth", f"{qoq:.2f}%")
+st.markdown("### 📈 Key Metrics")
+total, yoy, qoq = calculate_metrics(filtered_df)
+col1, col2, col3 = st.columns(3)
+col1.metric("Total Registrations", f"{total:,}")
+col2.metric("YoY Growth", f"{yoy:.2f}%")
+col3.metric("QoQ Growth", f"{qoq:.2f}%")
 
 # --- TREND CHART ---
-with st.expander("📅 Registration Trends Over Time", expanded=True):
-    trend_fig = plot_trend(filtered_df)
-    st.plotly_chart(trend_fig, use_container_width=True)
+st.markdown("### 📅 Registration Trends Over Time")
+st.plotly_chart(plot_trend(filtered_df), use_container_width=True)
 
 # --- TOP MANUFACTURERS ---
-with st.expander("🏆 Top Manufacturers", expanded=True):
-    top_manu_fig = plot_top_manufacturers(filtered_df)
-    st.plotly_chart(top_manu_fig, use_container_width=True)
+st.markdown("### 🏆 Top Manufacturers")
+st.plotly_chart(plot_top_manufacturers(filtered_df), use_container_width=True)
 
 # --- DATA TABLE ---
-with st.expander("📋 Detailed Data", expanded=False):
-    st.dataframe(filtered_df.style.format({"Registrations": "{:,}"}), height=400)
+st.markdown("### 📋 Detailed Data")
+st.dataframe(filtered_df.style.format({"Registrations": "{:,}"}))
 
 # --- FOOTER ---
 st.markdown("---")
 st.markdown(
-    "Built with ❤️ using Streamlit & Plotly | Data Source: Vahan / Google Drive CSV",
+    "Built with ❤️ using Streamlit & Plotly | Data Source: Vahan Dashboard",
     unsafe_allow_html=True
 )
