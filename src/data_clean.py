@@ -6,7 +6,7 @@ import numpy as np
 # Base paths
 # -----------------------------
 BASE_DIR = os.path.dirname(__file__)
-RAW_PATH = os.path.join(BASE_DIR, "data", "raw", "vehicle_data_raw.csv")  # now default CSV
+RAW_PATH = os.path.join(BASE_DIR, "data", "raw", "vehicle_data_raw.csv")  # default CSV
 CLEANED_PATH = os.path.join(BASE_DIR, "data", "processed", "vehicle_data_cleaned.xlsx")
 
 # -----------------------------
@@ -30,11 +30,8 @@ def safe_read_raw(raw_path: str = RAW_PATH, sheet_name: str = 0):
 def normalize_and_clean(df: pd.DataFrame) -> pd.DataFrame:
     print(">> Cleaning data...")
     df = df.copy()
-
-    # Normalize column names
     df.columns = [str(c).strip() for c in df.columns]
 
-    # Map columns to expected schema
     col_map = {}
     for c in df.columns:
         lc = c.lower()
@@ -48,16 +45,12 @@ def normalize_and_clean(df: pd.DataFrame) -> pd.DataFrame:
             col_map[c] = "Manufacturer"
         elif "regist" in lc or "count" in lc or "registration" in lc:
             col_map[c] = "Registrations"
-
     df = df.rename(columns=col_map)
 
     # Fill missing columns
-    if "Registrations" not in df.columns:
-        df["Registrations"] = 1
-    if "Manufacturer" not in df.columns:
-        df["Manufacturer"] = "Unknown"
-    if "Vehicle_Type" not in df.columns:
-        df["Vehicle_Type"] = "Unknown"
+    for col, default in [("Registrations", 1), ("Manufacturer", "Unknown"), ("Vehicle_Type", "Unknown")]:
+        if col not in df.columns:
+            df[col] = default
 
     # Parse dates
     if "Date" in df.columns:
@@ -76,8 +69,7 @@ def normalize_and_clean(df: pd.DataFrame) -> pd.DataFrame:
 
     # Add Year and Quarter
     df['Year'] = df['Date'].dt.year
-    q = df['Date'].dt.quarter
-    df['Quarter'] = df['Year'].astype(str) + "Q" + q.astype(str)
+    df['Quarter'] = df['Year'].astype(str) + "Q" + df['Date'].dt.quarter.astype(str)
 
     # Standardize Vehicle_Type
     vt_map = {
@@ -108,7 +100,8 @@ def normalize_and_clean(df: pd.DataFrame) -> pd.DataFrame:
 # -----------------------------
 def save_clean(df: pd.DataFrame, cleaned_path: str = CLEANED_PATH):
     os.makedirs(os.path.dirname(cleaned_path), exist_ok=True)
-    df.to_excel(cleaned_path, index=False)
+    # Explicitly specify engine to avoid Streamlit Cloud error
+    df.to_excel(cleaned_path, index=False, engine='openpyxl')
     print(f">> Cleaned data saved to: {cleaned_path}")
 
 # -----------------------------
