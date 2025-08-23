@@ -1,24 +1,29 @@
-# src/data_fetch.py
 import os
 import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime
 import requests
+from io import BytesIO
 
-RAW_PATH = "data/raw/vehicle_data_raw.xlsx"
+RAW_PATH = "data/raw/vehicle_data_raw.csv"
 
 def fetch_from_url(csv_url: str, raw_path: str = RAW_PATH):
     """
-    Try to download CSV from csv_url and save as Excel to raw_path.
+    Try to download CSV from csv_url and save as CSV to raw_path.
     If download fails, exception will be raised.
     """
     print(f">> Attempting to download data from: {csv_url}")
     resp = requests.get(csv_url, timeout=30)
     resp.raise_for_status()
+
     # read into dataframe
-    df = pd.read_csv(pd.io.common.BytesIO(resp.content))
+    df = pd.read_csv(BytesIO(resp.content))
+
+    # ensure folder exists
     os.makedirs(os.path.dirname(raw_path), exist_ok=True)
-    df.to_excel(raw_path, index=False, sheet_name="raw")
+
+    # save as CSV (not Excel)
+    df.to_csv(raw_path, index=False)
     print(f">> Downloaded and saved raw data to: {raw_path}")
     return raw_path
 
@@ -64,14 +69,17 @@ def generate_sample_raw(raw_path: str = RAW_PATH, n_months: int = 48):
                 })
 
     df = pd.DataFrame(rows)
+
+    # ensure folder exists
     os.makedirs(os.path.dirname(raw_path), exist_ok=True)
-    df.to_excel(raw_path, index=False, sheet_name="raw")
+
+    # save as CSV (not Excel)
+    df.to_csv(raw_path, index=False)
     print(f">> Sample raw data saved to: {raw_path} (rows: {len(df)})")
     return raw_path
 
 if __name__ == "__main__":
     # Example usage:
-    # If you have a CSV URL (replace below), uncomment and use:
     # csv_url = "https://example.com/vahan_export.csv"
     # fetch_from_url(csv_url)
 
