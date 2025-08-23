@@ -2,33 +2,39 @@ import os
 import pandas as pd
 import numpy as np
 
-RAW_PATH = "data/raw/vehicle_data_raw.xlsx"
-CLEANED_PATH = "data/processed/vehicle_data_cleaned.xlsx"
+# -----------------------------
+# Base paths
+# -----------------------------
+BASE_DIR = os.path.dirname(__file__)
+RAW_PATH = os.path.join(BASE_DIR, "data", "raw", "vehicle_data_raw.csv")  # now default CSV
+CLEANED_PATH = os.path.join(BASE_DIR, "data", "processed", "vehicle_data_cleaned.xlsx")
 
+# -----------------------------
+# Safe read raw file (CSV or Excel)
+# -----------------------------
 def safe_read_raw(raw_path: str = RAW_PATH, sheet_name: str = 0):
     print(f">> Reading raw file: {raw_path}")
-    df = pd.read_excel(raw_path, sheet_name=sheet_name)
+    ext = os.path.splitext(raw_path)[1].lower()
+    if ext in [".xlsx", ".xls"]:
+        df = pd.read_excel(raw_path, sheet_name=sheet_name)
+    elif ext == ".csv":
+        df = pd.read_csv(raw_path)
+    else:
+        raise ValueError(f"Unsupported file type: {ext}")
     print(f">> Raw columns: {list(df.columns)}")
     return df
 
+# -----------------------------
+# Normalize and clean data
+# -----------------------------
 def normalize_and_clean(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Normalize column names and types to an expected schema:
-    Expected columns in cleaned data:
-      - Date (datetime)
-      - Year (int)
-      - Quarter (str, format 'YYYYQx' or 'YYYY-Q{1..4}')
-      - Vehicle_Type (2W/3W/4W)
-      - Manufacturer
-      - Registrations (int)
-    """
     print(">> Cleaning data...")
     df = df.copy()
 
-    # Lower/strip column names
+    # Normalize column names
     df.columns = [str(c).strip() for c in df.columns]
 
-    # Try to find common column name variants
+    # Map columns to expected schema
     col_map = {}
     for c in df.columns:
         lc = c.lower()
@@ -44,7 +50,8 @@ def normalize_and_clean(df: pd.DataFrame) -> pd.DataFrame:
             col_map[c] = "Registrations"
 
     df = df.rename(columns=col_map)
-    # Fill missing expected columns if absent
+
+    # Fill missing columns
     if "Registrations" not in df.columns:
         df["Registrations"] = 1
     if "Manufacturer" not in df.columns:
@@ -82,8 +89,10 @@ def normalize_and_clean(df: pd.DataFrame) -> pd.DataFrame:
         df['Vehicle_Type'].astype(str).str.strip().str.upper()
     )
 
-    # Remove empty rows
-    drop_mask = (df['Registrations'] == 0) & (df['Manufacturer'].str.lower() == 'unknown') & (df['Vehicle_Type'].str.lower() == 'unknown')
+    # Remove empty/irrelevant rows
+    drop_mask = (df['Registrations'] == 0) & \
+                (df['Manufacturer'].str.lower() == 'unknown') & \
+                (df['Vehicle_Type'].str.lower() == 'unknown')
     dropped = drop_mask.sum()
     if dropped > 0:
         print(f">> Dropping {dropped} empty/irrelevant rows")
@@ -94,22 +103,32 @@ def normalize_and_clean(df: pd.DataFrame) -> pd.DataFrame:
 
     return agg
 
+# -----------------------------
+# Save cleaned data
+# -----------------------------
 def save_clean(df: pd.DataFrame, cleaned_path: str = CLEANED_PATH):
     os.makedirs(os.path.dirname(cleaned_path), exist_ok=True)
     df.to_excel(cleaned_path, index=False)
     print(f">> Cleaned data saved to: {cleaned_path}")
 
+# -----------------------------
+# Run full cleaning
+# -----------------------------
 def run(cleaned_path: str = CLEANED_PATH, raw_path: str = RAW_PATH):
     df_raw = safe_read_raw(raw_path)
     df_clean = normalize_and_clean(df_raw)
     save_clean(df_clean, cleaned_path)
-    return cleaned_path
+    return df_clean, cleaned_path
 
-# ✅ Alias for backward compatibility
+# Alias for backward compatibility
 clean_data = normalize_and_clean
 
+# -----------------------------
+# Main execution for standalone run
+# -----------------------------
 if __name__ == "__main__":
     if not os.path.exists(RAW_PATH):
-        print("Raw file not found - generate sample raw data first (use data_fetch.py).")
-    else:
-        run()
+        print("Raw file not found - generating sample CSV instead.")
+        from data_fetch import generate_sample_raw
+        generate_sample_raw(raw_path=RAW_PATH)
+    run()

@@ -8,15 +8,25 @@ import data_clean
 import charts
 
 # -------------------------------------------------
-# 1. Load raw data (CSV from repo or generate sample)
+# 1. Define paths and ensure they work on Streamlit Cloud
 # -------------------------------------------------
-RAW_PATH = "data/raw/vehicle_data_raw.csv"
+BASE_DIR = os.path.dirname(__file__)  # folder where app.py lives
+RAW_PATH = os.path.join(BASE_DIR, "data", "raw", "vehicle_data_raw.csv")
 
+# Create directories if missing
+os.makedirs(os.path.dirname(RAW_PATH), exist_ok=True)
+
+# Generate sample data if CSV not found
 if not os.path.exists(RAW_PATH):
-    st.warning("No CSV found, generating sample dataset...")
+    st.warning("CSV not found, generating sample dataset...")
     data_fetch.generate_sample_raw(RAW_PATH)
 
-df_raw = pd.read_csv(RAW_PATH)
+# Load data
+try:
+    df_raw = pd.read_csv(RAW_PATH)
+except Exception as e:
+    st.error(f"Failed to load CSV: {e}")
+    st.stop()
 
 # -------------------------------------------------
 # 2. Clean data
@@ -65,12 +75,20 @@ st.markdown("---")
 tab1, tab2 = st.tabs(["📈 Trend", "🏭 Top Manufacturers"])
 
 with tab1:
-    st.plotly_chart(charts.plot_trend(filtered_df), use_container_width=True)
+    fig_trend = charts.plot_trend(filtered_df)
+    if fig_trend:
+        st.plotly_chart(fig_trend, use_container_width=True)
+    else:
+        st.info("No trend data available for selected filters.")
 
 with tab2:
-    st.plotly_chart(charts.plot_top_manufacturers(filtered_df), use_container_width=True)
+    fig_top = charts.plot_top_manufacturers(filtered_df)
+    if fig_top:
+        st.plotly_chart(fig_top, use_container_width=True)
+    else:
+        st.info("No manufacturer data available for selected filters.")
 
 # -------------------------------------------------
 # Footer
 # -------------------------------------------------
-st.caption("Data Source: Vahan / Sample Data")
+st.caption("Data Source: Vahan / Sample Data | Dashboard deployed via Streamlit Cloud")
