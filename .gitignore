@@ -27,3 +27,9 @@ data/processed/
 # Docker-related
 *.log
 *.tmp
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore DevContainer configs
+.devcontainer/
