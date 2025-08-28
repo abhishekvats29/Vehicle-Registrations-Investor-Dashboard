@@ -3,8 +3,10 @@
 - This project is an interactive vehicle registration dashboard designed with an investor’s perspective in mind.
 - It visualizes Year-over-Year (YoY) and Quarter-over-Quarter (QoQ) growth for different vehicle categories and manufacturers using public Vahan Dashboard data.
 - Built with Streamlit, it enables filtering, date range selection, and trend visualization in a clean, professional UI.
-
 ---
+
+🔗 **Live Demo:** [Click here](https://your-live-project-link.com)
+
 ## Demo Screenshot
 - Example investor-friendly dashboard view.
 <img width="1255" height="691" alt="Image" src="https://github.com/user-attachments/assets/b46ff0dd-99ed-4c7e-a08f-0d7401a59b49" />
