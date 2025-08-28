@@ -5,7 +5,7 @@
 - Built with Streamlit, it enables filtering, date range selection, and trend visualization in a clean, professional UI.
 ---
 
-🔗 **Live Demo:** [Click here](https://your-live-project-link.com)
+🔗 **Live Demo:** [Click here](https://vehicle-registrations-investor-dashboard-in.streamlit.app/)
 
 ## Demo Screenshot
 - Example investor-friendly dashboard view.
