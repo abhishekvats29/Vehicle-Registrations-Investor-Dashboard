@@ -35,7 +35,7 @@ project_root/
 │   ├── data_analysis.py   # Performs calculations (YoY, QoQ, totals)
 │   ├── ui.py              # Streamlit UI components and layout
 │   ├── main.py            # Entry point to run the dashboard
-│
+│   ├── app.py             # Entry point for deployment on streamlit cloud
 ├── requirements.txt       # Python dependencies
 ├── README.md              # Project documentation
 └── .gitignore             # Git ignore rules
