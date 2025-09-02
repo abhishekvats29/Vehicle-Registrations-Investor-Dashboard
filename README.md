@@ -20,6 +20,7 @@
 - Requests / BeautifulSoup (Data fetching)
 - SQLAlchemy (Optional SQL integration)
 - Docker (For containerized deployment)
+- Deployed on Streamlit Cloud
 
 ---
 
