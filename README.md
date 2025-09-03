@@ -67,7 +67,7 @@ Optional – Run via Docker
 ---
 
 ## 👤 Author
-- Abhishek Vats, Backend developer
+- Abhishek Vats, Software developer
 - Copyright © 2025 Abhishek Vats. All rights reserved.
 
 ## 📄 License
