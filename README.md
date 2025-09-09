@@ -72,4 +72,6 @@ Optional – Run via Docker
 
 ## 📄 License
 - This project is Developed as part of an assignment.
+- The code is intended solely for the purpose of the assignment and Gaining Practical knowledge.
+- Unauthorized use, distribution, or commercial use is prohibited without explicit permission.
 
