@@ -7,7 +7,7 @@
 
 🔗 **Live Site:** [Click here](https://vehicle-registrations-investor-dashboard-in.streamlit.app/)
 
-## Demo Screenshot
+## Demo Snapshot
 - Example investor-friendly dashboard view.
 <img width="1255" height="691" alt="Image" src="https://github.com/user-attachments/assets/b46ff0dd-99ed-4c7e-a08f-0d7401a59b49" />
 
