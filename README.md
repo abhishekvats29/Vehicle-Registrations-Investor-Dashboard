@@ -59,6 +59,7 @@ Optional – Run via Docker
 
 ## Feature Roadmap (If Continued)
 - Live API integration with real-time Vahan Dashboard updates.
+- SQLAlchemy (SQL integration).
 - Export graphs and reports as PDF for investors.
 - Add more granular filters such as state/region-level data.
 - Integrate machine learning for future trend forecasting.
