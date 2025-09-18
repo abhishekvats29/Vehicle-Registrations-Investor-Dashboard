@@ -63,7 +63,7 @@ Optional – Run via Docker
 - Export graphs and reports as PDF for investors.
 - Add more granular filters such as state/region-level data.
 - Integrate machine learning for future trend forecasting.
-- Deploy on cloud (Streamlit Cloud, AWS, or Docker container).
+- Deploy on cloud (AWS, or Docker container).
 
 ---
 
